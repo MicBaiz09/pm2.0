@@ -18,9 +18,12 @@ export const useProcesses = (serverId?: string) => {
   const mutate = (path: string) => async (processId: string) =>
     api.post(`/servers/${serverId}/processes/${processId}/${path}`);
 
-  const start = useMutation({ mutationFn: mutate("start"), onSuccess: () => queryClient.invalidateQueries(["processes", serverId]) });
-  const stop = useMutation({ mutationFn: mutate("stop"), onSuccess: () => queryClient.invalidateQueries(["processes", serverId]) });
-  const restart = useMutation({ mutationFn: mutate("restart"), onSuccess: () => queryClient.invalidateQueries(["processes", serverId]) });
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["processes", serverId] });
+
+  const start = useMutation({ mutationFn: mutate("start"), onSuccess: invalidate });
+  const stop = useMutation({ mutationFn: mutate("stop"), onSuccess: invalidate });
+  const restart = useMutation({ mutationFn: mutate("restart"), onSuccess: invalidate });
 
   return { list, start, stop, restart };
 };
