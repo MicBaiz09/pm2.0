@@ -9,10 +9,11 @@ RUN npm run build
 # Stage 2: build backend
 FROM node:20-alpine AS backend-build
 WORKDIR /app/backend
+RUN apk add --no-cache openssl libc6-compat
 COPY backend/package.json backend/package-lock.json* ./
 RUN npm install
 COPY backend/ .
-RUN npm run build
+RUN npx prisma generate && npm run build
 
 # Stage 3: final runtime
 FROM node:20-alpine
