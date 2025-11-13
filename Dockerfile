@@ -9,9 +9,9 @@ RUN npm run build
 # Stage 2: build backend
 FROM node:20-alpine AS backend-build
 WORKDIR /app/backend
-RUN apk add --no-cache openssl libc6-compat python3 make g++
+RUN apk add --no-cache openssl libc6-compat python3 make g++ git bash
 COPY backend/package.json backend/package-lock.json* ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY backend/ .
 RUN npx prisma generate && npm run build
 RUN npm prune --omit=dev
