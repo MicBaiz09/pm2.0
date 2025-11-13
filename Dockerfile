@@ -31,10 +31,8 @@ ENV http_proxy=${HTTP_PROXY} \
     npm_config_noproxy=${NO_PROXY} \
     npm_config_strict_ssl=true
 WORKDIR /app/backend
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        openssl ca-certificates python3 make g++ git bash \
-    && ln -sf /usr/bin/python3 /usr/bin/python \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl ca-certificates python3 python-is-python3 make g++ git bash \
     && rm -rf /var/lib/apt/lists/*
 COPY backend/.npmrc backend/package.json backend/package-lock.json* ./
 RUN npm config set registry "${npm_config_registry:-https://registry.npmjs.org/}" \
