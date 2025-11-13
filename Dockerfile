@@ -1,8 +1,9 @@
 # Stage 1: build frontend
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
+RUN apk add --no-cache libc6-compat
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY frontend/ .
 RUN npm run build
 
