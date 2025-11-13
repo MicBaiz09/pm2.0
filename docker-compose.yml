@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT:-4000}:4000"
+    depends_on:
+      - postgres
+    env_file:
+      - backend/.env.example
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/botpanel?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      SOCKET_ORIGIN: ${SOCKET_ORIGIN:-http://localhost:5173}
+    volumes:
+      - ./frontend/dist:/app/frontend/dist
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: botpanel
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres-data:

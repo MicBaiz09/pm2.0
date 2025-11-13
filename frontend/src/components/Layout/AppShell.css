@@ -1,0 +1,46 @@
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+.shell-sidebar {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 1.5rem 1rem;
+}
+
+.shell-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.shell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
+}
+
+.shell-title {
+  font-weight: 600;
+}
+
+.shell-user button {
+  margin-left: 1rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+.shell-content {
+  padding: 1.5rem 2rem;
+  background: #f8fafc;
+  flex: 1;
+  overflow: auto;
+}

@@ -1,0 +1,70 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  VIEWER
+}
+
+enum ProcessStatus {
+  ONLINE
+  STOPPED
+  ERRORED
+  RESTARTING
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      UserRole @default(VIEWER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Server {
+  id          String   @id @default(cuid())
+  name        String
+  host        String
+  description String?
+  agentUrl    String
+  agentToken  String
+  isLocal     Boolean  @default(false)
+  processes   BotProcess[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model BotProcess {
+  id              String         @id @default(cuid())
+  serverId        String
+  server          Server         @relation(fields: [serverId], references: [id])
+  name            String
+  command         String
+  cwd             String
+  env             Json
+  instances       Int            @default(1)
+  autoRestart     Boolean        @default(true)
+  status          ProcessStatus  @default(STOPPED)
+  restartCount    Int            @default(0)
+  lastStartedAt   DateTime?
+  lastStoppedAt   DateTime?
+  histories       BotProcessHistory[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model BotProcessHistory {
+  id          String        @id @default(cuid())
+  processId   String
+  process     BotProcess    @relation(fields: [processId], references: [id])
+  status      ProcessStatus
+  message     String?
+  createdAt   DateTime      @default(now())
+}
