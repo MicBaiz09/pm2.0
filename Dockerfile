@@ -31,9 +31,21 @@ ENV http_proxy=${HTTP_PROXY} \
     npm_config_noproxy=${NO_PROXY} \
     npm_config_strict_ssl=true
 WORKDIR /app/backend
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    openssl ca-certificates python3 python-is-python3 make g++ git bash \
-    && rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    apt-get update; \
+    for attempt in 1 2 3; do \
+        if apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
+            openssl ca-certificates python3 python-is-python3 make g++ git bash; then \
+            break; \
+        elif [ "${attempt}" -lt 3 ]; then \
+            echo "apt-get install failed, retrying (${attempt}/3)..." >&2; \
+            sleep 5; \
+            apt-get update; \
+        else \
+            exit 1; \
+        fi; \
+    done; \
+    rm -rf /var/lib/apt/lists/*
 COPY backend/.npmrc backend/package.json backend/package-lock.json* ./
 RUN npm config set registry "${npm_config_registry:-https://registry.npmjs.org/}" \
     && npm config set @prisma:registry "${npm_config_registry:-https://registry.npmjs.org/}" \
