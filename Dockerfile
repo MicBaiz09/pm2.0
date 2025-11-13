@@ -35,7 +35,7 @@ RUN set -eux; \
     apt-get update; \
     for attempt in 1 2 3; do \
         if apt-get -o Acquire::Retries=5 install -y --no-install-recommends \
-            openssl ca-certificates python3 make g++ git bash; then \
+            openssl ca-certificates python3 python-is-python3 make g++ git bash; then \
             break; \
         elif [ "${attempt}" -lt 3 ]; then \
             echo "apt-get install failed, retrying (${attempt}/3)..." >&2; \
@@ -45,7 +45,6 @@ RUN set -eux; \
             exit 1; \
         fi; \
     done; \
-    ln -sf /usr/bin/python3 /usr/bin/python; \
     rm -rf /var/lib/apt/lists/*
 COPY backend/.npmrc backend/package.json backend/package-lock.json* ./
 RUN npm config set registry "${npm_config_registry:-https://registry.npmjs.org/}" \
