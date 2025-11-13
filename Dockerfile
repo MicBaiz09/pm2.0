@@ -1,24 +1,25 @@
-# Stage 1: build frontend
-FROM node:20-alpine AS frontend-build
+# Stage 1: build frontend (Debian for easier native builds)
+FROM node:20-bullseye-slim AS frontend-build
 WORKDIR /app/frontend
-RUN apk add --no-cache libc6-compat
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm install --legacy-peer-deps
 COPY frontend/ .
 RUN npm run build
 
-# Stage 2: build backend
-FROM node:20-alpine AS backend-build
+# Stage 2: build backend (Debian for Prisma and build tools)
+FROM node:20-bullseye-slim AS backend-build
 WORKDIR /app/backend
-RUN apk add --no-cache openssl libc6-compat python3 make g++ git bash
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl ca-certificates python3 make g++ git bash \
+    && rm -rf /var/lib/apt/lists/*
 COPY backend/package.json backend/package-lock.json* ./
 RUN npm install --legacy-peer-deps
 COPY backend/ .
 RUN npx prisma generate && npm run build
 RUN npm prune --omit=dev
 
-# Stage 3: final runtime
-FROM node:20-alpine
+# Stage 3: final runtime (Debian for Prisma glibc engines)
+FROM node:20-bullseye-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=backend-build /app/backend/dist ./backend/dist
