@@ -11,6 +11,7 @@ FROM node:20-bullseye-slim AS backend-build
 WORKDIR /app/backend
 RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl ca-certificates python3 make g++ git bash \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
     && rm -rf /var/lib/apt/lists/*
 COPY backend/package.json backend/package-lock.json* ./
 RUN npm install --legacy-peer-deps
