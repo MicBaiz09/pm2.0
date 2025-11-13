@@ -2,18 +2,19 @@
 FROM node:20-alpine AS frontend-build
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json* ./
-RUN npm install
+RUN npm ci
 COPY frontend/ .
 RUN npm run build
 
 # Stage 2: build backend
 FROM node:20-alpine AS backend-build
 WORKDIR /app/backend
-RUN apk add --no-cache openssl libc6-compat
+RUN apk add --no-cache openssl libc6-compat python3 make g++
 COPY backend/package.json backend/package-lock.json* ./
-RUN npm install
+RUN npm ci
 COPY backend/ .
 RUN npx prisma generate && npm run build
+RUN npm prune --omit=dev
 
 # Stage 3: final runtime
 FROM node:20-alpine
